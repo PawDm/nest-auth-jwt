@@ -33,8 +33,10 @@ export class AuthService {
 
   async login(userDto: CreateUserDto) {
     const user = await this.validateUser(userDto)
-    const payload = { username: user.username, userId: user.id };
-    const tokens = this.tokenService.generateTokens(payload)
+
+    const payload = { username: user.username, userId: user.id, roles: user.roles };
+
+      const tokens = this.tokenService.generateTokens(payload)
       const result = await this.tokenService.saveToken(payload.userId, tokens.refreshToken);
       return{
         ...tokens,
@@ -55,7 +57,8 @@ export class AuthService {
         ...userDto,
         password: hashPassword,
       });
-      const payload = { username: user.username, userId: user.id };
+
+      const payload = { username: user.username, userId: user.id, roles: user.roles };
 
       const tokens = this.tokenService.generateTokens(payload)
       const result = await this.tokenService.saveToken(payload.userId, tokens.refreshToken);
