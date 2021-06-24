@@ -23,8 +23,18 @@ export class RolesService {
       .leftJoinAndSelect('roles.users', 'user')
       .getOne();
 
+      const usersWithOutPassword = role.users.map(function(i) {
+        delete i.password
+        return i;
+      })
+
+
+
       // Хочу тут спред, чтоб хэшпароли не показывал
-      // const {users , ...result} = role;
+      const {users , ...result} = role;
+      // result['users'] = usersWithOutPassword
+      // result['abra'] = usersWithOutPassword
+      console.log(usersWithOutPassword);
     return role;
   }
 

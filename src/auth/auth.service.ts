@@ -4,11 +4,10 @@ import { CreateUserDto } from 'src/users/DTOs/createUser.dto';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcryptjs';
 import { TokensService } from './token.service';
+import { ResetPassDto } from 'src/users/DTOs/reset-pass.dto';
 
 @Injectable()
 export class AuthService {
-
-
 
   constructor(
     private usersService: UsersService,
@@ -100,4 +99,53 @@ export class AuthService {
         user: payload
       }
   }
+
+
+  async generateKeyForPassword(username: string) {
+   const user = await this.usersService.getByUsername(username)
+   if (!user) {
+    throw new HttpException(
+      `Пользователя ${username} не существует`,
+      HttpStatus.NOT_FOUND,
+    );
+   }
+   const secretCode = this.generateRandomDigits(5)
+    await this.usersService.setResetCode(secretCode,user)
+
+   // этот код будем записывать в поле новый столбец у юзера и выдавать юзеру по почте. если все совпало когда он сделает следующий запрос то все ОК и заводим ему новый пассворд
+   return secretCode;
+  }
+
+  async resetPassword(dto: ResetPassDto) {
+    const user = await this.usersService.getByUsername(dto.username)
+   if (!user) {
+    throw new HttpException(
+      `Пользователя ${dto.username} не существует`,
+      HttpStatus.NOT_FOUND,
+    );
+   }
+   if(user.resetPasswordCode === dto.resetCode){
+
+      const newHashedPass = await bcrypt.hash(dto.newPassword, 5)
+      await this.usersService.setNewPassword(newHashedPass,user)
+      return "success"
+
+   }
+   else{
+    throw new HttpException(
+      `Неверно введен секретный код`,
+      HttpStatus.NOT_FOUND,
+    );
+   }
+
+
+  }
+
+
+  private generateRandomDigits(length: number): string {
+    return Array.from({ length }, () =>
+      Math.floor(Math.random() * 10).toString(),
+    ).join('');
+  }
+
 }

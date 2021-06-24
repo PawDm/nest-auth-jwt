@@ -1,5 +1,8 @@
 import { Controller, Post, UseGuards, Body,Res, Get, Request, Req} from '@nestjs/common';
 import { CreateUserDto } from 'src/users/DTOs/createUser.dto';
+import { ForgotPassDto } from 'src/users/DTOs/forgot-pass.dto';
+import { ResetPassDto } from 'src/users/DTOs/reset-pass.dto';
+import { UserAuthenticated } from 'src/users/user-authed.decorator';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 
@@ -74,5 +77,22 @@ export class AuthController {
         secure: true,
       });
       return userDate;
+  }
+
+
+  @Post('forgot-pass')
+  async forgotPassword(
+    @Body() dto : ForgotPassDto
+  ){
+    const keyForNewPassword = await this.authService.generateKeyForPassword(dto.username);
+    return keyForNewPassword;
+  }
+
+  @Post('confrim-reset-pass')
+  async resetPassword(
+    @Body() dto : ResetPassDto
+  ){
+    const result = await this.authService.resetPassword(dto);
+    return result ;
   }
 }

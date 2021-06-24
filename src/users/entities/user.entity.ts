@@ -17,6 +17,11 @@ export class User {
   @Column()
   password: string;
 
+  @ApiProperty({ example: '123456', description: 'Код восстановления паролья'})
+  @Column({nullable:true})
+  resetPasswordCode: string;
+
+
   @ApiProperty({ example: 'false', description: 'Забанен пользователь или нет'})
   @Column({default:false})
   banned: boolean;

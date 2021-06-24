@@ -59,4 +59,14 @@ export class UsersService {
       throw new HttpException('User or Role not found', HttpStatus.NOT_FOUND);
   }
 
+  async setResetCode(resetCode: string, user: User){
+    user.resetPasswordCode = resetCode;
+    return await this.userRepository.save(user)
+  }
+
+  async setNewPassword(newPassword: string, user: User){
+    user.password = newPassword;
+    return await this.userRepository.save(user)
+  }
+
 }

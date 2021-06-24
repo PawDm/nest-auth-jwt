@@ -6,6 +6,7 @@ import { RolesGuard } from 'src/auth/roles.guard';
 import { AddRoleDto } from 'src/roles/DTOs/add-role.dto';
 import { CreateUserDto } from './DTOs/createUser.dto';
 import { User } from './entities/user.entity';
+import { UserAuthenticated } from './user-authed.decorator';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -14,8 +15,8 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  getProfile(@Request() req) {
-    return req.user;
+  getProfile(@UserAuthenticated() user : User) {
+    return user;
   }
 
   @ApiOperation({ summary: 'Создание пользователя' })
